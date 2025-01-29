@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Powered Legal Awareness System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="firebaseauth.js"></script>
+    <style>
+        body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
+        color: #343a40;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        header nav a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+        header nav a:hover {
+            color: #d1ecf1;
+        }
+        .container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .container h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .container ul {
+            list-style-type: disc;
+            padding-left: 40px;
+        }
+        .container ul li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        footer {
+            text-align: center;
+            background-color: #343a40;
+            color: white;
+            padding: 15px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .form-section {
+            margin: 20px 0;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-section input, .form-section textarea, .form-section button {
+            display: block;
+            margin: 15px 0;
+            padding: 12px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .form-section button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-section button:hover {
+            background-color: #0056b3;
+        }
+        .contact-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+        }
+        .contact-card {
+            background: #ffffff;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: calc(20% - 20px);
+            text-align: center;
+            font-size: 16px;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Updated CSS for choice-section */
+        .choice-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .choice-section button {
+            background-color: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            width: 180px;
+        }
+
+        .choice-section button:hover {
+            background-color: #218838;
+            transform: translateY(-3px);
+        }
+
+        .choice-section button:active {
+            transform: translateY(0);
+        }
+        #feedback-section {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #feedback-section h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        #feedback-section p {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .form-section {
+            margin-top: 20px;
+        }
+
+        .form-section input,
+        .form-section textarea,
+        .form-section button {
+            display: block;
+            margin: 10px 0;
+            padding: 12px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-section button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form-section button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Rating section */
+        .rating {
+            display: flex;
+            justify-content: space-between;
+            width: 250px;
+            margin-bottom: 15px;
+        }
+
+        .rating input[type="radio"] {
+            display: none;
+        }
+
+        .rating label {
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .rating input[type="radio"]:checked ~ label {
+            color: #007bff;
+        }
+
+        #thank-you-message {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AI Powered Legal Awareness System</h1>
+        <nav>
+            <a href="#" onclick="showHomePage()">Home</a>
+            <a href="#" onclick="showLoginPage()">Login</a>
+            <a href="#feedback" onclick="showFeedbackForm()">Feedback</a>
+            <a href="#contact" onclick="showContactSection()">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div id="about-section">
+            <h2>What does this webpage do?</h2>
+            <ul>
+                <li>Once you log in, you can enter your problem statement here in clear and unambiguous words.</li>
+                <li>Once the problem statement is submitted, you will be provided the top 5 IPC sections that are most relevant to your case.</li>
+                <li>You can also know about the IPC sections with probable illustrations.</li>
+                <li>You can also know whether those are bailable or not.</li>
+                <li>You can also know the punishment or fine that comes under that IPC section.</li>
+            </ul>
+        </div>
+
+        <div id="login-section" class="hidden">
+            <div class="body-container">
+                <div class="container-form" id="signup" style="display:none;">
+                    <h1 class="form-title">Register</h1>
+                    <form method="post" action="">
+                        <div id="signUpMessage" class="messageDiv" style="display:none;"></div>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text"  id="fName" placeholder="First Name" required>
+                                <label for="fname">First Name</label>
+                            </div>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text"  id="lName" placeholder="Last Name" required>
+                                <label for="lName">Last Name</label>
+                            </div>
+                            <div class="input-group">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email"  id="rEmail" placeholder="Email" required>
+                                <label for="rEmail">Email</label>
+                            </div>
+                                <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="rPassword"  placeholder="Password" required>
+                                <label for="rPassword">Password</label>
+                            </div>
+                            <button class="btn" id="submitSignUp" >Sign Up</button>
+                    </form>
+                        <div class="links">
+                        <p>Already Have Account ?</p>
+                        <button id="signInButton">Sign In</button>
+                        </div>
+                    </div>
+    
+                    <div class="container-form" id="signIn">
+                        <h1 class="form-title">Sign In</h1>
+                        <form method="post" action="">
+                            <div id="signInMessage" class="messageDiv" style="display:none;"></div>
+    
+                            <div class="input-group">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email"  id="email" placeholder="Email" required>
+                                <label for="email">Email</label>
+                            </div>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                            <input type="password" id="password"  placeholder="Password" required>
+                                <label for="password">Password</label>
+                            </div>
+                        <button  class="btn"  id="submitSignIn">Sign In</button>
+                        </form>
+                        <div class="links">
+                            <p>Don't have account yet?</p>
+                            <button id="signUpButton">Sign Up</button>
+                        </div>
+                    </div>
+                    <script src="script.js"></script>
+            </div>
+
+            </div>
+
+        <div id="problem-section" class="hidden">
+            <h2>Enter Your Problem</h2>
+            <form id="problem-form" class="form-section" onsubmit="submitProblem(event)">
+                <textarea placeholder="Describe your problem statement here..." required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+            <div id="result-section" class="hidden">
+                <h2>Results</h2>
+                <p id="results"></p>
+            </div>
+        </div>
+
+        <div id="feedback-section" class="hidden">
+            <h2>We Value Your Feedback</h2>
+            <p>Your feedback helps us improve our system. Please share your experience with us.</p>
+        
+            <form class="form-section" onsubmit="submitFeedback(event)">
+                <!-- Rating System -->
+                <label for="rating">Rate Your Experience:</label>
+                <div class="rating">
+                    <input type="radio" id="1-star" name="rating" value="1" required />
+                    <label for="1-star">1</label>
+                    <input type="radio" id="2-star" name="rating" value="2" />
+                    <label for="2-star">2</label>
+                    <input type="radio" id="3-star" name="rating" value="3" />
+                    <label for="3-star">3</label>
+                    <input type="radio" id="4-star" name="rating" value="4" />
+                    <label for="4-star">4</label>
+                    <input type="radio" id="5-star" name="rating" value="5" />
+                    <label for="5-star">5</label>
+                </div>
+        
+                <!-- Email and Feedback Message -->
+                <label for="email">Your Email:</label>
+                <input type="email" id="email" placeholder="Enter your email ID" required />
+                
+                <label for="message">Your Feedback:</label>
+                <textarea id="message" placeholder="Enter your feedback or suggestions here" required></textarea>
+                
+                <button type="submit">Submit Feedback</button>
+            </form>
+        
+            <!-- Success Message -->
+            <div id="thank-you-message" class="hidden">
+                <p>Thank you for your feedback! We appreciate your input.</p>
+            </div>
+        </div>
+
+        <div id="contact-section" class="hidden">
+            <h2>Contact Us</h2>
+            <div class="contact-section">
+                <div class="contact-card">
+                    <p><strong>Tirumanagiri Siva Sai Prasad</strong></p>
+                    <p>9121389322</p>
+                </div>
+                <div class="contact-card">
+                    <p><strong>Tummalapalli Sai Hemanth</strong></p>
+                    <p>9059372271</p>
+                </div>
+                <div class="contact-card">
+                    <p><strong>Nimmala Venkata Satya Sai</strong></p>
+                    <p>6300127712</p>
+                </div>
+                <div class="contact-card">
+                    <p><strong>Seelam Madhu Ratnam</strong></p>
+                    <p>9676398277</p>
+                </div>
+                <div class="contact-card">
+                    <p><strong>Undavalli Lokesh Satyanarayana</strong></p>
+                    <p>9177595909</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 AI Powered Legal Awareness System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        function showHomePage() {
+            document.getElementById('about-section').classList.remove('hidden');
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('problem-section').classList.add('hidden');
+            document.getElementById('feedback-section').classList.add('hidden');
+            document.getElementById('contact-section').classList.add('hidden');
+        }
+
+        function showLoginPage() {
+            document.getElementById('about-section').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('problem-section').classList.add('hidden');
+            document.getElementById('feedback-section').classList.add('hidden');
+            document.getElementById('contact-section').classList.add('hidden');
+        }
+
+        function showFeedbackForm() {
+            document.getElementById('about-section').classList.add('hidden');
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('problem-section').classList.add('hidden');
+            document.getElementById('feedback-section').classList.remove('hidden');
+            document.getElementById('contact-section').classList.add('hidden');
+        }
+
+        function showContactSection() {
+            document.getElementById('about-section').classList.add('hidden');
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('problem-section').classList.add('hidden');
+            document.getElementById('feedback-section').classList.add('hidden');
+            document.getElementById('contact-section').classList.remove('hidden');
+        }
+
+        function showExistingUserForm() {
+            document.getElementById('existing-user-form').classList.remove('hidden');
+            document.getElementById('new-user-form').classList.add('hidden');
+        }
+
+        function showNewUserForm() {
+            document.getElementById('existing-user-form').classList.add('hidden');
+            document.getElementById('new-user-form').classList.remove('hidden');
+        }
+
+        function loginUser(event) {
+            event.preventDefault();
+            
+            // Get the entered email and password
+            const email = event.target.querySelector('input[type="email"]').value;
+            const password = event.target.querySelector('input[type="password"]').value;
+            
+            console.log("Entered Email: ", email); // Debugging: log entered email
+            console.log("Entered Password: ", password); // Debugging: log entered password
+            
+            // Sample credentials (in a real app, you would check with a backend database)
+            const correctEmail = 'user@example.com';
+            const correctPassword = 'password123';
+            
+            // Validate credentials
+            if (email.trim() === correctEmail && password.trim() === correctPassword) {
+                alert('Login successful!');
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('problem-section').classList.remove('hidden');
+            } else {
+                alert('Invalid email or password. Please try again.');
+            }
+        }
+
+        function registerUser(event) {
+            event.preventDefault();
+            // Placeholder registration logic
+            alert('Account created successfully! Please login now.');
+            showExistingUserForm();
+        }
+
+        function submitFeedback(event) {
+            event.preventDefault();
+
+            // Get the form data
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            // For now, log the feedback data (this would be sent to a backend in a real scenario)
+            console.log('Rating:', rating);
+            console.log('Email:', email);
+            console.log('Feedback Message:', message);
+
+            // Hide feedback form and show the thank you message
+            document.querySelector('.form-section').classList.add('hidden');
+            document.getElementById('thank-you-message').classList.remove('hidden');
+        }
+        function submitProblem(event) {
+            event.preventDefault();
+            const problemText = event.target.querySelector('textarea').value;
+            if (problemText.trim() === '') {
+                alert('Please enter a valid problem statement.');
+                return;
+            }
+            // Simulate backend call and show results
+            document.getElementById('results').innerText = 'Top 5 IPC sections relevant to your case will appear here.';
+            document.getElementById('result-section').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
